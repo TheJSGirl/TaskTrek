@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 
 import Header from '../../components/Header/Header';
 import {CardTodo} from '../../components/CardTodo/CardTodo';
+import {TableBottomMenu} from '../../components/TabBottomMenu/TabBottomMenu';
+
 
 
 export default function HomeScreen() {
@@ -18,7 +20,9 @@ export default function HomeScreen() {
       {id: 6, title: 'Learn React Native', isCompleted: false},
     
     ]
-  )
+  );
+
+  const [selectedTab, setSelectedTab] = useState('all')
 
   function updateTodo(todo) {
     const updatedTodo = {
@@ -52,7 +56,7 @@ export default function HomeScreen() {
     </SafeAreaView>
   </SafeAreaProvider>
    <View style={styles.footer}>
-   <Text>Footer</Text>
+   <TableBottomMenu selectedTab={selectedTab} onPress={setSelectedTab} todoList={todoList}/>
  </View></>
 }
 
@@ -78,7 +82,6 @@ root: {
  },
  footer: {
   height: 70,
-  backgroundColor: 'green'
  },
  cardItem: {
   marginBottom: 15
