@@ -20,9 +20,22 @@ export default function HomeScreen() {
     ]
   )
 
+  function updateTodo(todo) {
+    const updatedTodo = {
+      ...todo,
+      isCompleted: !todo.isCompleted
+    };
+    const updateTodoList = [...todoList]
+    const index = updateTodoList.findIndex(t => t.id === updatedTodo.id);
+
+    updateTodoList[index] = updatedTodo;
+    setTodoList(updateTodoList);
+
+  }
+
   function renderTodoList() {
-    return todoList.map((todo , i) => <View style={styles.cardItem}>
-      <CardTodo todo={todo} key={i}/>
+    return todoList.map((todo , i) => <View style={styles.cardItem}  key={todo.id}>
+      <CardTodo todo={todo} onPress={updateTodo}/>
     </View>)
   }
   return <><SafeAreaProvider >
