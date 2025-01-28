@@ -37,8 +37,21 @@ export default function HomeScreen() {
 
   }
 
+  function getFilteredList() {
+    switch(selectedTab) {
+      case 'all':
+        return todoList;
+      case 'inProgress':
+        return todoList.filter((todo) => !todo.isCompleted );
+      
+      case 'done':
+        return todoList.filter((todo) => todo.isCompleted)
+      
+    }
+  }
+
   function renderTodoList() {
-    return todoList.map((todo , i) => <View style={styles.cardItem}  key={todo.id}>
+    return getFilteredList()?.map((todo , i) => <View style={styles.cardItem}  key={todo.id}>
       <CardTodo todo={todo} onPress={updateTodo}/>
     </View>)
   }
