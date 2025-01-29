@@ -6,23 +6,23 @@ import React, { useState } from 'react';
 import Header from '../../components/Header/Header';
 import {CardTodo} from '../../components/CardTodo/CardTodo';
 import {TableBottomMenu} from '../../components/TabBottomMenu/TabBottomMenu';
-
-
+import {ButtonAdd} from '../../components/ButtonAdd/ButtonAdd';
+import Dialog from "react-native-dialog";
+import uuid from 'react-native-uuid';
 
 export default function HomeScreen() {
+
   const [todoList, setTodoList] = useState(
     [
-      {id: 1, title: 'Walk the dog', isCompleted: true},
-      {id: 2, title: 'Go to the dentist', isCompleted: true},
-      {id: 3, title: 'Learn React Native', isCompleted: false},
-      {id: 4, title: 'Learn React Native', isCompleted: false},
-      {id: 5, title: 'Learn React Native', isCompleted: false},
-      {id: 6, title: 'Learn React Native', isCompleted: false},
+      {id: '1', title: 'Walk the dog', isCompleted: true},
+      
     
     ]
   );
+  const [inputValue, setInputValue] = useState('');
 
-  const [selectedTab, setSelectedTab] = useState('all')
+  const [selectedTab, setSelectedTab] = useState('all');
+  const [showAddDialog, setShowAddDialog] = useState(false);
 
   function updateTodo(todo : any) {
     const updatedTodo = {
@@ -72,6 +72,33 @@ export default function HomeScreen() {
       <CardTodo todo={todo} onPress={updateTodo} onLongPress={onLongPress} />
     </View>)
   }
+
+  function showDialog() {
+    return setShowAddDialog(true)
+  }
+
+  function addTodo() {
+    const newTodo = {
+      id: uuid.v4(),
+      title: inputValue,
+      isCompleted: false
+    }
+    setTodoList([...todoList, newTodo])
+    setShowAddDialog(false)
+  }
+
+  function renderAddDialog() {
+    return ( <Dialog.Container visible={showAddDialog} onBackdropPress={() => setShowAddDialog(false)}>
+      <Dialog.Title>Add todo</Dialog.Title>
+      <Dialog.Description>
+       Choose a name for your todo
+      </Dialog.Description>
+      <Dialog.Input onChangeText={setInputValue} placeholder='Ex: Go to the dentis'/>
+      <Dialog.Button label="Cancel" onPress={() =>{}} />
+      <Dialog.Button label="Add" onPress={() =>addTodo()} />
+    </Dialog.Container>
+    )
+  }
   return <><SafeAreaProvider >
     <SafeAreaView style={styles.app}>
       <View style={styles.header}>
@@ -83,11 +110,14 @@ export default function HomeScreen() {
         </ScrollView>
         {/* {todoList.map((todo, i) => <CardTodo todo={todoList}  key={i}/>)} */}
       </View>
+      <ButtonAdd onPress={showDialog} />
     </SafeAreaView>
   </SafeAreaProvider>
    <View style={styles.footer}>
    <TableBottomMenu selectedTab={selectedTab} onPress={setSelectedTab} todoList={todoList}/>
- </View></>
+ </View>
+ {renderAddDialog()}
+ </>
 }
 
 const styles = StyleSheet.create({
