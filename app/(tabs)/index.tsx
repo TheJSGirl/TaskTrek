@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Platform } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import {Text, View, ScrollView} from 'react-native';
+import {Text, View, ScrollView, Alert} from 'react-native';
 import React, { useState } from 'react';
 
 import Header from '../../components/Header/Header';
@@ -24,7 +24,7 @@ export default function HomeScreen() {
 
   const [selectedTab, setSelectedTab] = useState('all')
 
-  function updateTodo(todo) {
+  function updateTodo(todo : any) {
     const updatedTodo = {
       ...todo,
       isCompleted: !todo.isCompleted
@@ -50,9 +50,26 @@ export default function HomeScreen() {
     }
   }
 
+  function onLongPress(todo: any) {
+
+    Alert.alert('Delete todo', 'Are you sure you want to delete this todo ?', [
+      {text: 'Delete',
+        style: 'destructive',
+        onPress: () => {
+          console.log('Delete this todo', todo);
+          let filtered = todoList.filter((el: any) => el.id !== todo.id);
+          setTodoList(filtered)
+        },
+
+      },
+      {text: 'Cancel', style: 'cancel'}
+    ])
+
+  }
+
   function renderTodoList() {
     return getFilteredList()?.map((todo , i) => <View style={styles.cardItem}  key={todo.id}>
-      <CardTodo todo={todo} onPress={updateTodo}/>
+      <CardTodo todo={todo} onPress={updateTodo} onLongPress={onLongPress} />
     </View>)
   }
   return <><SafeAreaProvider >
