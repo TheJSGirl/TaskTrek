@@ -2,7 +2,7 @@ import { TouchableOpacity, View, Text } from 'react-native';
 import {styles} from './TabBottom.style';
 
 export function TableBottomMenu({selectedTab, onPress, todoList}) {
-    const countByStatus = todoList.reduce((acc, todo) => {
+    const countByStatus = todoList?.reduce((acc, todo) => {
         todo.isCompleted ? acc.done++: acc.inProgress++;
         return acc
         

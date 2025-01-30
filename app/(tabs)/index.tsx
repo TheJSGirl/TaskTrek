@@ -1,7 +1,7 @@
 import { Image, StyleSheet, Platform } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {Text, View, ScrollView, Alert} from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Header from '../../components/Header/Header';
 import {CardTodo} from '../../components/CardTodo/CardTodo';
@@ -9,28 +9,62 @@ import {TableBottomMenu} from '../../components/TabBottomMenu/TabBottomMenu';
 import {ButtonAdd} from '../../components/ButtonAdd/ButtonAdd';
 import Dialog from "react-native-dialog";
 import uuid from 'react-native-uuid';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HomeScreen() {
 
-  const [todoList, setTodoList] = useState(
+  const [todoList, setTodoList] = useState<any>(
     [
-      {id: '1', title: 'Walk the dog', isCompleted: true},
-      
-    
     ]
   );
   const [inputValue, setInputValue] = useState('');
 
   const [selectedTab, setSelectedTab] = useState('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
+  let isFirstRender = true
+
+  useEffect(() => {
+    loadData()
+  },[])
+  useEffect(() => {
+    if(!isFirstRender) {
+      saveData()
+
+    }else {
+      isFirstRender = false
+    }
+  }, [todoList])
+
+  async function loadData() {
+    try{
+      const todoListString = await AsyncStorage.getItem('@todoList');
+      if(todoListString) {
+        const parseString = JSON.parse(todoListString);
+        setTodoList(parseString)
+
+      }
+    }catch(err) {
+      console.log(err)
+    }
+  }
+
+  async function saveData() {
+
+    try{
+      await AsyncStorage.setItem('@todoList', JSON.stringify(todoList))
+    }catch(err) {
+      console.log(err)
+    }
+  }
 
   function updateTodo(todo : any) {
+    if(!todo.length) return
     const updatedTodo = {
       ...todo,
       isCompleted: !todo.isCompleted
     };
-    const updateTodoList = [...todoList]
-    const index = updateTodoList.findIndex(t => t.id === updatedTodo.id);
+    const updateTodoList:any = [...todoList] 
+    const index = updateTodoList.findIndex((t:any) => t?.id === updatedTodo?.id);
 
     updateTodoList[index] = updatedTodo;
     setTodoList(updateTodoList);
@@ -38,14 +72,15 @@ export default function HomeScreen() {
   }
 
   function getFilteredList() {
+    
     switch(selectedTab) {
       case 'all':
         return todoList;
       case 'inProgress':
-        return todoList.filter((todo) => !todo.isCompleted );
+        return todoList.filter((todo:any) => !todo?.isCompleted );
       
       case 'done':
-        return todoList.filter((todo) => todo.isCompleted)
+        return todoList.filter((todo:any) => todo?.isCompleted)
       
     }
   }
@@ -68,8 +103,8 @@ export default function HomeScreen() {
   }
 
   function renderTodoList() {
-    return getFilteredList()?.map((todo , i) => <View style={styles.cardItem}  key={todo.id}>
-      <CardTodo todo={todo} onPress={updateTodo} onLongPress={onLongPress} />
+    return getFilteredList()?.map((todo:any , i:any) =>  <View style={styles.cardItem}  key={todo.id}>
+       <CardTodo todo={todo} onPress={updateTodo} onLongPress={onLongPress} /> 
     </View>)
   }
 
@@ -85,6 +120,7 @@ export default function HomeScreen() {
     }
     setTodoList([...todoList, newTodo])
     setShowAddDialog(false)
+    setInputValue("");
   }
 
   function renderAddDialog() {
@@ -95,7 +131,7 @@ export default function HomeScreen() {
       </Dialog.Description>
       <Dialog.Input onChangeText={setInputValue} placeholder='Ex: Go to the dentis'/>
       <Dialog.Button label="Cancel" onPress={() =>{}} />
-      <Dialog.Button label="Add" onPress={() =>addTodo()} />
+      <Dialog.Button label="Save" onPress={() =>addTodo()} disabled={inputValue.length ===0} />
     </Dialog.Container>
     )
   }
@@ -106,7 +142,7 @@ export default function HomeScreen() {
       </View>
       <View style={styles.body}>
         <ScrollView>
-          {renderTodoList()}
+          {   renderTodoList()}
         </ScrollView>
         {/* {todoList.map((todo, i) => <CardTodo todo={todoList}  key={i}/>)} */}
       </View>
